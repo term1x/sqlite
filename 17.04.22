@@ -1,0 +1,56 @@
+import sqlite3
+from random import choice
+class DataBase:
+
+    def __init__(self,file):
+        self.con = sqlite3.connect(file)
+        self.cur = self.con.cursor()
+        self.create_table('score')
+
+    def create_table(self,table_name):
+        que_create = '''CREATE TABLE IF NOT EXISTS {} (
+          id INTEGER PRIMARY KEY,
+          name TEXT,
+          score_points INTEGER,
+          frags INTEGER
+        )'''.format(table_name)
+        self.cur.execute(que_create)
+        self.con.commit()
+
+    def get(self, que = 'SELECT * FROM score Order By score_points DESC,name ASC'):
+        return self.cur.execute(que).fetchall()
+
+    def insert(self,name,score,frags):
+        que_insert = f'''
+        INSERT INTO score (name, score_points,frags)
+        VALUES ('{name}',{score},{frags})
+        '''
+        self.cur.execute(que_insert)
+        self.con.commit()
+
+    def __del__(self):
+        '''
+
+        :return:
+        '''
+        self.con.close()
+
+
+
+
+
+
+data_base = DataBase('game.sqlite')
+pool_name = ('Василий','Денис','Костя','Саша')
+pool_score_points =('12','4','40','15')
+pool_frags = tuple(range(2,6))
+
+for i in range(5):
+    name_insert = choice(pool_name)
+    score_points_insert = choice(pool_score_points)
+    frags_insert = choice(pool_frags)
+    data_base.insert(name_insert,score_points_insert,frags_insert)
+
+data = data_base.get()
+for line in data:
+    print(line)
