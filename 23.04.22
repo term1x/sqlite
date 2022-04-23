@@ -1,0 +1,79 @@
+import sqlite3
+from random import choice
+class Users:
+
+    def __init__(self,file):
+        self.con = sqlite3.connect(file)
+        self.cur = self.con.cursor()
+        self.create_table('users')
+
+    def create_table(self,table_name):
+        que_create = '''CREATE TABLE IF NOT EXISTS {} (
+          id INTEGER PRIMARY KEY,
+          name TEXT,
+          cash INTEGER,
+          year INTEGER
+        )'''.format(table_name)
+        self.cur.execute(que_create)
+        self.con.commit()
+
+    def add_money(self , id , money):
+        que_create = f''' UPDATE users SET cash = cash + {money} WHERE id = {id} '''
+
+        self.cur.execute(que_create)
+        self.con.commit()
+
+    def get(self, que = 'SELECT * FROM users'):
+        return self.cur.execute(que).fetchall()
+
+    def get_old_users(self, que = 'SELECT * FROM users Order By year limit 3 '):
+        return self.cur.execute(que).fetchall()
+
+    def delete_user(self,name):
+        que_insert = f'''
+           DELETE FROM users WHERE name = '{name}'
+        '''
+        self.cur.execute(que_insert)
+        self.con.commit()
+
+    def insert(self,name,cash,year):
+        que_insert = f'''
+        INSERT INTO users (name, cash, year)
+        VALUES ('{name}',{cash},{year})
+        '''
+        self.cur.execute(que_insert)
+        self.con.commit()
+
+    def __del__(self):
+        '''
+
+        :return:
+        '''
+        self.con.close()
+
+
+
+
+
+
+data_base = Users('market.sqlite')
+#data_base.delete_user()
+#data_base.insert('term1x' , 7629 , 15)
+#data_base.insert('m1hag' , 2450 , 12)
+#data_base.insert('adamrus' , 4100 , 8)
+#data_base.insert('hayastan' , 10000 , 17)
+#data_base.insert('govnar' , 1000 , 2)
+pool_name = ('term1x','m1hag','adamrus','hayastan','govnar')
+pool_cash =(7000,4456,4068,54594,2353)
+pool_year = (50,3,24,23,5)
+data_base.add_money(5,15000)
+
+for i in range(5):
+   name_insert = choice(pool_name)
+   cash_insert = choice(pool_cash)
+   year_insert = choice(pool_year)
+   #data_base.insert(name_insert,cash_insert,year_insert)
+
+data = data_base.get()
+for line in data:
+    print(line)
